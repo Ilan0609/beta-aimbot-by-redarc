@@ -7,7 +7,7 @@ local LocalPlayer = Players.LocalPlayer
 local Holding = false
 local MenuVisible = true
 
-
+-- Paramètres globaux
 _G.AimbotEnabled = true
 _G.ESPEnabled = true
 _G.TeamCheck = true -- Activer la vérification des alliés
@@ -15,7 +15,7 @@ _G.AimPart = "Head" -- Cibler la tête
 _G.Sensitivity = 0.1
 _G.AimbotMaxDistance = 350
 
-
+-- FOV - Champ de vision
 _G.CircleRadius = 200
 _G.CircleSides = 64
 _G.CircleColor = Color3.fromRGB(255, 255, 255)
@@ -24,7 +24,7 @@ _G.CircleFilled = false
 _G.CircleVisible = true
 _G.CircleThickness = 1
 
-
+-- Initialisation du cercle FOV
 local FOVCircle = Drawing.new("Circle")
 FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 FOVCircle.Radius = _G.CircleRadius
@@ -35,7 +35,7 @@ FOVCircle.Transparency = _G.CircleTransparency
 FOVCircle.NumSides = _G.CircleSides
 FOVCircle.Thickness = _G.CircleThickness
 
-
+-- Fonction pour calculer la distance entre deux points
 local function GetDistanceInMeters(p1, p2)
     return (p1 - p2).Magnitude
 end
@@ -71,7 +71,7 @@ local function GetClosestPlayer()
     return Target
 end
 
-
+-- Détecter le clic droit pour activer l'aimbot
 UserInputService.InputBegan:Connect(function(Input)
     if Input.UserInputType == Enum.UserInputType.MouseButton2 then
         Holding = true
@@ -151,13 +151,13 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
-
+-- Création du menu
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.Enabled = MenuVisible
 
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 200, 0, 200)
+Frame.Size = UDim2.new(0, 200, 0, 250)
 Frame.Position = UDim2.new(0, 10, 0, 10)
 Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 Frame.Parent = ScreenGui
@@ -180,14 +180,23 @@ ESPButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 ESPButton.TextColor3 = Color3.new(1, 1, 1)
 ESPButton.Parent = Frame
 
+local AimbotRivalsButton = Instance.new("TextButton")
+AimbotRivalsButton.Size = UDim2.new(1, 0, 0, 30)
+AimbotRivalsButton.Position = UDim2.new(0, 0, 0, 80)
+AimbotRivalsButton.Text = "Load Aimbot Rivals"
+AimbotRivalsButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+AimbotRivalsButton.TextColor3 = Color3.new(1, 1, 1)
+AimbotRivalsButton.Parent = Frame
+
 local FOVSlider = Instance.new("TextBox")
 FOVSlider.Size = UDim2.new(1, 0, 0, 30)
-FOVSlider.Position = UDim2.new(0, 0, 0, 80)
+FOVSlider.Position = UDim2.new(0, 0, 0, 120)
 FOVSlider.Text = tostring(_G.CircleRadius)
 FOVSlider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 FOVSlider.TextColor3 = Color3.new(1, 1, 1)
 FOVSlider.Parent = Frame
 
+-- Actions des boutons
 AimbotButton.MouseButton1Click:Connect(function()
     _G.AimbotEnabled = not _G.AimbotEnabled
     AimbotButton.Text = "Toggle Aimbot (" .. tostring(_G.AimbotEnabled) .. ")"
@@ -196,6 +205,16 @@ end)
 ESPButton.MouseButton1Click:Connect(function()
     _G.ESPEnabled = not _G.ESPEnabled
     ESPButton.Text = "Toggle ESP (" .. tostring(_G.ESPEnabled) .. ")"
+end)
+
+AimbotRivalsButton.MouseButton1Click:Connect(function()
+    -- Charger et exécuter le script Aimbot Rivals
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Ilan0609/rivals/refs/heads/main/rivals.lua"))()
+    
+    -- Désactiver le script actuel
+    ScreenGui.Enabled = false
+    -- Supprimer le bouton Load Aimbot Rivals
+    AimbotRivalsButton:Destroy()
 end)
 
 FOVSlider.FocusLost:Connect(function()
@@ -207,7 +226,7 @@ FOVSlider.FocusLost:Connect(function()
     end
 end)
 
-
+-- Touche pour afficher/masquer le menu
 UserInputService.InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.M then
         MenuVisible = not MenuVisible
