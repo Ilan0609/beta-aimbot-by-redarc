@@ -7,7 +7,7 @@ local LocalPlayer = Players.LocalPlayer
 local Holding = false
 local MenuVisible = true
 
--- Paramètres globaux
+
 _G.AimbotEnabled = true
 _G.ESPEnabled = true
 _G.TeamCheck = true -- Activer la vérification des alliés
@@ -15,7 +15,7 @@ _G.AimPart = "Head" -- Cibler la tête
 _G.Sensitivity = 0.1
 _G.AimbotMaxDistance = 350
 
--- FOV - Champ de vision
+
 _G.CircleRadius = 200
 _G.CircleSides = 64
 _G.CircleColor = Color3.fromRGB(255, 255, 255)
@@ -24,7 +24,7 @@ _G.CircleFilled = false
 _G.CircleVisible = true
 _G.CircleThickness = 1
 
--- Initialisation du cercle FOV
+
 local FOVCircle = Drawing.new("Circle")
 FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 FOVCircle.Radius = _G.CircleRadius
@@ -35,7 +35,7 @@ FOVCircle.Transparency = _G.CircleTransparency
 FOVCircle.NumSides = _G.CircleSides
 FOVCircle.Thickness = _G.CircleThickness
 
--- Fonction pour calculer la distance entre deux points
+
 local function GetDistanceInMeters(p1, p2)
     return (p1 - p2).Magnitude
 end
@@ -71,7 +71,7 @@ local function GetClosestPlayer()
     return Target
 end
 
--- Détecter le clic droit pour activer l'aimbot
+
 UserInputService.InputBegan:Connect(function(Input)
     if Input.UserInputType == Enum.UserInputType.MouseButton2 then
         Holding = true
@@ -151,7 +151,7 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
--- Création du menu
+
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.Enabled = MenuVisible
@@ -207,7 +207,7 @@ FOVSlider.FocusLost:Connect(function()
     end
 end)
 
--- Touche pour afficher/masquer le menu
+
 UserInputService.InputBegan:Connect(function(input)
     if input.KeyCode == Enum.KeyCode.M then
         MenuVisible = not MenuVisible
