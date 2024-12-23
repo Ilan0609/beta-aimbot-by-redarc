@@ -10,13 +10,12 @@ local MenuVisible = true
 -- Paramètres globaux
 _G.AimbotEnabled = true
 _G.ESPEnabled = true
-_G.TeamCheck = true -- Activer la vérification des alliés
-_G.AimPart = "Head" -- Cibler la tête
-_G.Sensitivity = 0.1
+_G.TeamCheck = true
+_G.AimPart = "Head"
+_G.CircleRadius = 200
 _G.AimbotMaxDistance = 350
 
 -- FOV - Champ de vision
-_G.CircleRadius = 200
 _G.CircleSides = 64
 _G.CircleColor = Color3.fromRGB(255, 255, 255)
 _G.CircleTransparency = 0.7
@@ -151,71 +150,106 @@ RunService.Heartbeat:Connect(function()
     end
 end)
 
+-- Fonction pour créer des cases à cocher
+local function createCheckbox(parent, text, position, defaultValue, callback)
+    local Frame = Instance.new("Frame")
+    Frame.Size = UDim2.new(0.9, 0, 0, 30)
+    Frame.Position = position
+    Frame.BackgroundTransparency = 1
+    Frame.Parent = parent
+
+    local Checkbox = Instance.new("TextButton")
+    Checkbox.Size = UDim2.new(0, 20, 0, 20)
+    Checkbox.Position = UDim2.new(0, 0, 0.5, -10)
+    Checkbox.BackgroundColor3 = defaultValue and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 0, 0)
+    Checkbox.Text = ""
+    Checkbox.Parent = Frame
+
+    local Label = Instance.new("TextLabel")
+    Label.Size = UDim2.new(1, -30, 1, 0)
+    Label.Position = UDim2.new(0, 30, 0, 0)
+    Label.BackgroundTransparency = 1
+    Label.Text = text
+    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Label.Font = Enum.Font.Gotham
+    Label.TextSize = 14
+    Label.TextXAlignment = Enum.TextXAlignment.Left
+    Label.Parent = Frame
+
+    local isChecked = defaultValue
+    Checkbox.MouseButton1Click:Connect(function()
+        isChecked = not isChecked
+        Checkbox.BackgroundColor3 = isChecked and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(200, 0, 0)
+        callback(isChecked)
+    end)
+end
+
+-- Fonction pour créer un bouton
+local function createButton(parent, text, position, callback)
+    local Button = Instance.new("TextButton")
+    Button.Size = UDim2.new(0.9, 0, 0, 30)
+    Button.Position = position
+    Button.Text = text
+    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Button.Font = Enum.Font.Gotham
+    Button.TextSize = 14
+    Button.Parent = parent
+
+    Button.MouseButton1Click:Connect(function()
+        callback()
+    end)
+end
+
 -- Création du menu
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
 ScreenGui.Enabled = MenuVisible
 
 local Frame = Instance.new("Frame")
-Frame.Size = UDim2.new(0, 200, 0, 250)
-Frame.Position = UDim2.new(0, 10, 0, 10)
+Frame.Size = UDim2.new(0, 300, 0, 300)
+Frame.Position = UDim2.new(0, 20, 0, 20)
 Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BorderSizePixel = 0
 Frame.Parent = ScreenGui
 Frame.Active = true
 Frame.Draggable = true
 
-local AimbotButton = Instance.new("TextButton")
-AimbotButton.Size = UDim2.new(1, 0, 0, 30)
-AimbotButton.Position = UDim2.new(0, 0, 0, 0)
-AimbotButton.Text = "Toggle Aimbot"
-AimbotButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-AimbotButton.TextColor3 = Color3.new(1, 1, 1)
-AimbotButton.Parent = Frame
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 30)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+Title.Text = "Cheat Menu"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.TextSize = 16
+Title.Font = Enum.Font.GothamBold
+Title.TextXAlignment = Enum.TextXAlignment.Center
+Title.Parent = Frame
 
-local ESPButton = Instance.new("TextButton")
-ESPButton.Size = UDim2.new(1, 0, 0, 30)
-ESPButton.Position = UDim2.new(0, 0, 0, 40)
-ESPButton.Text = "Toggle ESP"
-ESPButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-ESPButton.TextColor3 = Color3.new(1, 1, 1)
-ESPButton.Parent = Frame
+-- Ajouter des cases à cocher
+createCheckbox(Frame, "Enable Aimbot", UDim2.new(0, 10, 0, 40), _G.AimbotEnabled, function(value)
+    _G.AimbotEnabled = value
+end)
 
-local AimbotRivalsButton = Instance.new("TextButton")
-AimbotRivalsButton.Size = UDim2.new(1, 0, 0, 30)
-AimbotRivalsButton.Position = UDim2.new(0, 0, 0, 80)
-AimbotRivalsButton.Text = "Load Aimbot Rivals"
-AimbotRivalsButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-AimbotRivalsButton.TextColor3 = Color3.new(1, 1, 1)
-AimbotRivalsButton.Parent = Frame
+createCheckbox(Frame, "Enable ESP", UDim2.new(0, 10, 0, 80), _G.ESPEnabled, function(value)
+    _G.ESPEnabled = value
+end)
 
+createCheckbox(Frame, "Team Check", UDim2.new(0, 10, 0, 120), _G.TeamCheck, function(value)
+    _G.TeamCheck = value
+end)
+
+-- Ajout du FOV Radius
 local FOVSlider = Instance.new("TextBox")
-FOVSlider.Size = UDim2.new(1, 0, 0, 30)
-FOVSlider.Position = UDim2.new(0, 0, 0, 120)
+FOVSlider.Size = UDim2.new(0.9, 0, 0, 30)
+FOVSlider.Position = UDim2.new(0, 10, 0, 160)
 FOVSlider.Text = tostring(_G.CircleRadius)
 FOVSlider.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-FOVSlider.TextColor3 = Color3.new(1, 1, 1)
+FOVSlider.TextColor3 = Color3.fromRGB(255, 255, 255)
+FOVSlider.Font = Enum.Font.Gotham
+FOVSlider.TextSize = 14
+FOVSlider.TextXAlignment = Enum.TextXAlignment.Center
 FOVSlider.Parent = Frame
-
--- Actions des boutons
-AimbotButton.MouseButton1Click:Connect(function()
-    _G.AimbotEnabled = not _G.AimbotEnabled
-    AimbotButton.Text = "Toggle Aimbot (" .. tostring(_G.AimbotEnabled) .. ")"
-end)
-
-ESPButton.MouseButton1Click:Connect(function()
-    _G.ESPEnabled = not _G.ESPEnabled
-    ESPButton.Text = "Toggle ESP (" .. tostring(_G.ESPEnabled) .. ")"
-end)
-
-AimbotRivalsButton.MouseButton1Click:Connect(function()
-    -- Charger et exécuter le script Aimbot Rivals
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/Ilan0609/rivals/refs/heads/main/rivals.lua"))()
-    
-    -- Désactiver le script actuel
-    ScreenGui.Enabled = false
-    -- Supprimer le bouton Load Aimbot Rivals
-    AimbotRivalsButton:Destroy()
-end)
 
 FOVSlider.FocusLost:Connect(function()
     local newValue = tonumber(FOVSlider.Text)
@@ -224,6 +258,15 @@ FOVSlider.FocusLost:Connect(function()
     else
         FOVSlider.Text = tostring(_G.CircleRadius)
     end
+end)
+
+-- Ajout du bouton Aimbot Rivals
+createButton(Frame, "Load Aimbot Rivals", UDim2.new(0, 10, 0, 200), function()
+    -- Charger et exécuter le script Aimbot Rivals
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Ilan0609/rivals/refs/heads/main/rivals.lua"))()
+    
+    -- Désactiver le script actuel
+    ScreenGui.Enabled = false
 end)
 
 -- Touche pour afficher/masquer le menu
